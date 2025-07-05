@@ -1,0 +1,10 @@
+# Ignorar dependencias y archivos pesados
+node_modules/
+.env
+build/
+dist/
+.expo/
+
+# Archivos innecesarios
+.DS_Store
+package-lock.json
