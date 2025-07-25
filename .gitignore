@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Node.js
 node_modules/
 dist/
@@ -14,3 +15,15 @@ logs/
 # VSCode
 .vscode/
 .DS_Store
+=======
+# Ignorar dependencias y archivos pesados
+node_modules/
+.env
+build/
+dist/
+.expo/
+
+# Archivos innecesarios
+.DS_Store
+package-lock.json
+>>>>>>> f3a11e1991f11e30c28dc031e60bfe589326e63a
