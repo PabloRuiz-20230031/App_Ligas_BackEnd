@@ -313,6 +313,24 @@ const obtenerTemporadasActivas = async (req, res) => {
   }
 };
 
+const obtenerTodasTemporadasActivas = async (req, res) => {
+  try {
+    const hoy = new Date();
+
+    const temporadas = await Temporada.find({
+      fechaInicio: { $lte: hoy },
+      fechaFin: { $gte: hoy }
+    }).populate({
+      path: 'categoria',
+      populate: { path: 'liga', select: 'nombre' }
+    });
+
+    res.json(temporadas);
+  } catch (error) {
+    console.error('❌ Error al obtener todas las temporadas activas:', error);
+    res.status(500).json({ mensaje: 'Error al obtener temporadas activas' });
+  }
+};
 
 module.exports = {
   crearTemporadaCompleta,
@@ -322,5 +340,6 @@ module.exports = {
   verificarTemporadaActiva,
   obtenerTablaPorTemporada,
   obtenerJornadasPorTemporada,
-  obtenerTemporadasActivas
+  obtenerTemporadasActivas,
+  obtenerTodasTemporadasActivas
 };
