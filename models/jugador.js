@@ -24,7 +24,8 @@ const jugadorSchema = new mongoose.Schema({
     required: true
   },
   foto: {
-    type: String // Puedes almacenar una URL o nombre de archivo
+    type: String, // Puedes almacenar una URL o nombre de archivo
+    default: ''
   },
   equipo: {
     type: mongoose.Schema.Types.ObjectId,

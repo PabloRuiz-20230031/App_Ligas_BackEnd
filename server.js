@@ -1,54 +1,43 @@
 const express = require('express');
-const connectDB = require('./config/db');
 const cors = require('cors');
-const ligaRoute = require('./routes/ligaRoute');
-const categoriaRoute = require('./routes/categoriaRoute');
-const equipoRoutes = require('./routes/equipoRoute');
-const jugadorRoutes = require('./routes/jugadorRoute');
-const representanteRoutes = require('./routes/representanteRoute');
-const usuarioRoutes = require('./routes/usuarioRoute');
-const cedulaRoutes = require('./routes/cedulaRoute');
-const jornadaRoutes = require('./routes/jornadaRoute');
-const tablaRoutes = require('./routes/tablaRoute');
-const adminRoutes = require('./routes/adminRoute');
-const redSocialRoutes = require('./routes/redsocialRoute');
 const morgan = require('morgan');
+const connectDB = require('./config/db');
+require('dotenv').config(); // debe ir antes de usar variables de entorno
 
-
-
-require('dotenv').config();   
+// Conexión a la base de datos
+connectDB();
 
 const app = express();
 
-// Middlewares
+// Middlewares globales
 app.use(cors());
 app.use(express.json());
-
-app.use('/api', ligaRoute);
-app.use('/api', categoriaRoute);
-app.use('/api', equipoRoutes);
-app.use('/api', jugadorRoutes);
-app.use('/api', representanteRoutes);
-app.use('/api/usuarios', usuarioRoutes);
-app.use('/api', cedulaRoutes);
-app.use('/api', jornadaRoutes);
-app.use('/api', tablaRoutes);
-app.use('/api', adminRoutes);
-app.use('/api/redes-sociales', redSocialRoutes);
-
 app.use(morgan('dev'));
 
-
-// Conexión a la BD
-connectDB();
+// Rutas
+app.use('/api/ligas', require('./routes/ligaRoute'));
+app.use('/api/categorias', require('./routes/categoriaRoute'));
+app.use('/api/equipos', require('./routes/equipoRoute'));
+app.use('/api/jugadores', require('./routes/jugadorRoute'));
+app.use('/api/representantes', require('./routes/representanteRoute'));
+app.use('/api/usuarios', require('./routes/usuarioRoute'));
+app.use('/api/cedulas', require('./routes/cedulaRoute'));
+app.use('/api/jornadas', require('./routes/jornadaRoute'));
+app.use('/api/tabla', require('./routes/tablaRoute'));
+app.use('/api/redes-sociales', require('./routes/redsocialRoute'));
+app.use('/api/temporadas', require('./routes/temporadaCompletaRoute'));
+app.use('/api/partidos', require('./routes/partidoRoute'));
+app.use('/api/goleo', require('./routes/goleoRoute'));
+app.use('/api/tarjetas', require('./routes/tablaTarjetasRoute'));
+app.use('/api/info', require('./routes/infoEmpresaRoute'));
 
 // Ruta de prueba
 app.get('/', (req, res) => {
-  res.send('API de Ligas de Fútbol funcionando');
+  res.send('✅ API de Ligas de Fútbol funcionando');
 });
 
-// Escuchar en puerto
+// Escuchar el servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });

@@ -1,4 +1,6 @@
 const Categoria = require('../models/categoria');
+const Equipo = require('../models/equipo');       // ✅ Importa aquí
+const Temporada = require('../models/temporada');
 
 const crearCategoria = async (req, res) => {
   try {
@@ -28,10 +30,30 @@ const obtenerCategorias = async (req, res) => {
 const obtenerCategoriasPorLiga = async (req, res) => {
   try {
     const { ligaId } = req.params;
+
     const categorias = await Categoria.find({ liga: ligaId }).populate('liga', 'nombre');
-    res.json(categorias);
+
+    const resultado = await Promise.all(
+      categorias.map(async (cat) => {
+        const totalEquipos = await Equipo.countDocuments({ categoria: cat._id });
+        const tieneTemporada = await Temporada.exists({ categoria: cat._id });
+
+       return {
+        _id: cat._id,
+        nombre: cat.nombre,
+        liga: cat.liga,
+        imagen: cat.imagen, // ✅ agregado
+        descripcion: cat.descripcion, // opcional
+        totalEquipos,
+        tieneTemporada: !!tieneTemporada
+      };
+      })
+    );
+
+    res.json(resultado);
   } catch (error) {
-    res.status(500).json({ mensaje: 'Error al obtener categorías por liga', error });
+    console.error('Error al obtener categorías por liga:', error);
+    res.status(500).json({ mensaje: 'Error al obtener categorías', error });
   }
 };
 
@@ -74,11 +96,29 @@ const eliminarCategoria = async (req, res) => {
   }
 };
 
+const obtenerCategoriaPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const categoria = await Categoria.findById(id).populate('liga', 'nombre');
+
+    if (!categoria) {
+      return res.status(404).json({ mensaje: 'Categoría no encontrada' });
+    }
+
+    res.json(categoria);
+  } catch (error) {
+    console.error('❌ Error al obtener categoría por ID:', error);
+    res.status(500).json({ mensaje: 'Error al obtener la categoría', error });
+  }
+};
+
+
 
 module.exports = {
   crearCategoria,
   obtenerCategorias,
   obtenerCategoriasPorLiga,
   actualizarCategoria,
-  eliminarCategoria   
+  eliminarCategoria,
+  obtenerCategoriaPorId  
 };

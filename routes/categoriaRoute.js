@@ -1,18 +1,22 @@
 const express = require('express');
+const { verificarToken, soloAdmin } = require('../middlewares/authMiddleware');
 const router = express.Router();
 const {
   crearCategoria,
   obtenerCategorias,
   obtenerCategoriasPorLiga,
   actualizarCategoria,
-  eliminarCategoria
+  eliminarCategoria,
+  obtenerCategoriaPorId
 } = require('../controllers/categoriaController');
 
-router.post('/categorias', crearCategoria);
-router.get('/categorias', obtenerCategorias);
-router.get('/por-liga/:ligaId', obtenerCategoriasPorLiga);
-router.put('/categorias/:id', actualizarCategoria);
-router.delete('/categorias/:id', eliminarCategoria);
-
+// Ya no pongas '/categorias', solo rutas relativas
+router.post('/', crearCategoria);                             // POST /api/categorias
+router.get('/', obtenerCategorias);   
+router.get('/:id', obtenerCategoriaPorId);                       // GET /api/categorias
+router.get('/por-liga/:ligaId', obtenerCategoriasPorLiga);   // ✅ GET /api/categorias/por-liga/:ligaId
+router.put('/:id', actualizarCategoria);                     // PUT /api/categorias/:id
+router.delete('/:id', eliminarCategoria, verificarToken, soloAdmin);
+                    // DELETE /api/categorias/:id
 
 module.exports = router;

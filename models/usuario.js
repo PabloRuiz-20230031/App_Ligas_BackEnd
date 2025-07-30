@@ -18,6 +18,10 @@ const usuarioSchema = new mongoose.Schema({
     required: true,
     minlength: 6
   },
+  foto: {
+    type: String,
+    default: '' // URL a la imagen (Cloudinary u otro)
+  },
   rol: {
     type: String,
     enum: ['usuario', 'admin'],

@@ -1,13 +1,21 @@
+// routes/cedulaRoute.js
 const express = require('express');
 const router = express.Router();
+
+
+
 const {
   crearCedula,
-  obtenerCedulasPorCategoria
+  obtenerCedulasPorTemporada,
+  obtenerCedulaPorPartido,
+  obtenerTablaGoleoPorTemporada
 } = require('../controllers/cedulaController');
 
 const { verificarToken, soloAdmin } = require('../middlewares/authMiddleware');
 
-router.post('/cedulas', verificarToken, soloAdmin, crearCedula);
-router.get('/cedulas/:categoriaId', verificarToken, obtenerCedulasPorCategoria);
+// ✅ QUITA el prefijo "cedulas" aquí, porque ya lo estás usando en app.js
+router.post('/', verificarToken, soloAdmin, crearCedula);
+router.get('/temporada/:temporadaId', verificarToken, obtenerCedulasPorTemporada);
+router.get('/partido/:id', obtenerCedulaPorPartido);
 
 module.exports = router;

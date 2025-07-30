@@ -11,14 +11,22 @@ const equipoSchema = new mongoose.Schema({
     ref: 'Categoria',
     required: true
   },
-   imagen: {
+  imagen: {
     type: String, // URL de imagen en Cloudinary
     default: ''
   },
-    descripcion: {
+  descripcion: {
     type: String,
-    default: ''
+    required: true
   },
+  jugadores: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Jugador'
+  }],
+  representantes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Representante'
+  }]
 }, {
   timestamps: true
 });

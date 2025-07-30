@@ -1,15 +1,23 @@
 const express = require('express');
+const { verificarToken, soloAdmin } = require('../middlewares/authMiddleware');
 const router = express.Router();
 const {
   crearLiga,
   obtenerLigas,
   actualizarLiga,
-  eliminarLiga
+  eliminarLiga,
+  buscarLigas,
+  obtenerLigaPorId
 } = require('../controllers/ligaController');
 
-router.post('/ligas', crearLiga);
-router.get('/ligas', obtenerLigas);
-router.put('/ligas/:id', actualizarLiga);     // ✅ NUEVO
-router.delete('/ligas/:id', eliminarLiga);    // ✅ NUEVO
+// ⚠️ Elimina '/ligas' del path — ya está incluido por app.use('/api/ligas', ...)
+router.post('/', crearLiga);
+router.get('/', obtenerLigas);
+router.get('/buscar', buscarLigas);
+router.get('/:id', obtenerLigaPorId);
+router.put('/:id', actualizarLiga);
+router.delete('/:id', eliminarLiga, verificarToken, soloAdmin);
+
 
 module.exports = router;
+

@@ -63,9 +63,39 @@ const eliminarLiga = async (req, res) => {
   }
 };
 
+const buscarLigas = async (req, res) => {
+  try {
+    const { nombre } = req.query;
+
+    const ligas = await Liga.find({
+      nombre: { $regex: nombre, $options: 'i' }
+    }).limit(10);
+
+    res.json(ligas);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al buscar ligas', error });
+  }
+};
+
+const obtenerLigaPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const liga = await Liga.findById(id).populate('creador', 'nombre');
+    if (!liga) {
+      return res.status(404).json({ mensaje: 'Liga no encontrada' });
+    }
+    res.json(liga);
+  } catch (error) {
+    console.error('❌ Error al obtener liga por ID:', error);
+    res.status(500).json({ mensaje: 'Error al obtener la liga', error });
+  }
+};
+
 module.exports = {
   crearLiga,
   obtenerLigas,
   actualizarLiga,
-  eliminarLiga
+  eliminarLiga,
+  buscarLigas,
+  obtenerLigaPorId
 };
