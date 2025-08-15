@@ -9,7 +9,7 @@ const {
   obtenerTablaPorTemporada,
   obtenerJornadasPorTemporada,
   obtenerTemporadasActivas,
-  obtenerTodasTemporadasActivas
+  obtenerTodasTemporadasActivas,
 } = require('../controllers/temporadaCompletaController');
 
 const { verificarToken, verificarTokenOpcional, soloAdmin } = require('../middlewares/authMiddleware');
@@ -23,6 +23,7 @@ router.put('/:id', verificarToken, soloAdmin, editarTemporada);
 router.get('/activas', verificarTokenOpcional, obtenerTodasTemporadasActivas); // ✅ debe ir antes que /activas/:ligaId
 router.get('/activas/:ligaId', verificarTokenOpcional, obtenerTemporadasActivas);
 router.get('/categoria/:categoriaId', verificarTokenOpcional, obtenerTemporadaPorCategoria);
+router.get('/activa/:categoriaId', verificarTokenOpcional, verificarTemporadaActiva);
 router.get('/tabla/:temporadaId', verificarTokenOpcional, obtenerTablaPorTemporada);
 router.get('/jornadas/:temporadaId', verificarTokenOpcional, obtenerJornadasPorTemporada);
 

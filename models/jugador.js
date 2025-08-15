@@ -8,10 +8,14 @@ const jugadorSchema = new mongoose.Schema({
   },
   curp: {
     type: String,
-    required: true,
-    unique: true,
     uppercase: true,
-    match: [/^[A-Z][AEIOU][A-Z]{2}\d{6}[HM][A-Z]{2}[A-Z]{3}[0-9A-Z]\d$/, 'CURP no válida']
+    validate: {
+      validator: function (v) {
+        if (!v) return true; // Acepta vacío
+        return /^[A-Z][AEIOU][A-Z]{2}\d{6}[HM][A-Z]{2}[A-Z]{3}[0-9A-Z]\d$/.test(v);
+      },
+      message: 'CURP no válida'
+    }
   },
   dorsal: {
     type: Number,
@@ -24,7 +28,7 @@ const jugadorSchema = new mongoose.Schema({
     required: true
   },
   foto: {
-    type: String, // Puedes almacenar una URL o nombre de archivo
+    type: String,
     default: ''
   },
   equipo: {
@@ -36,7 +40,7 @@ const jugadorSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Validar que el dorsal sea único por equipo
+// Índice único: dorsal + equipo
 jugadorSchema.index({ dorsal: 1, equipo: 1 }, { unique: true });
 
 module.exports = mongoose.model('Jugador', jugadorSchema);

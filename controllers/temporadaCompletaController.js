@@ -332,6 +332,8 @@ const obtenerTodasTemporadasActivas = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   crearTemporadaCompleta,
   eliminarTemporada,
@@ -341,5 +343,5 @@ module.exports = {
   obtenerTablaPorTemporada,
   obtenerJornadasPorTemporada,
   obtenerTemporadasActivas,
-  obtenerTodasTemporadasActivas
+  obtenerTodasTemporadasActivas,
 };

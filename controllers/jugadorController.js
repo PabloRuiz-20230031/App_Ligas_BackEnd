@@ -1,4 +1,6 @@
 const Jugador = require('../models/jugador');
+const TablaGoleo = require('../models/tablaGoleo');
+const Tarjeta = require('../models/tablaTarjeta');
 
 // Crear jugador
 const crearJugador = async (req, res) => {
@@ -11,20 +13,29 @@ const crearJugador = async (req, res) => {
       return res.status(400).json({ mensaje: 'El equipo ya tiene el máximo de 30 jugadores' });
     }
 
-    const nuevoJugador = new Jugador({
+    const nuevoJugadorData = {
       nombre,
-      curp,
       dorsal,
       fechaNacimiento,
       foto,
       equipo
-    });
+    };
 
+    // Agregar CURP si se proporciona
+    if (curp && curp.trim() !== '') {
+      nuevoJugadorData.curp = curp.trim().toUpperCase();
+    }
+
+    const nuevoJugador = new Jugador(nuevoJugadorData);
     const guardado = await nuevoJugador.save();
     res.status(201).json(guardado);
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(400).json({ mensaje: 'CURP o dorsal duplicado para este equipo' });
+      const campoDuplicado = Object.keys(error.keyPattern)[0];
+      if (campoDuplicado === 'dorsal') {
+        return res.status(400).json({ mensaje: 'Dorsal duplicado para este equipo' });
+      }
+      return res.status(400).json({ mensaje: 'Error por campo duplicado', campo: campoDuplicado });
     }
     res.status(500).json({ mensaje: 'Error al registrar jugador', error });
   }
@@ -41,26 +52,7 @@ const obtenerJugadoresPorEquipo = async (req, res) => {
   }
 };
 
-const actualizarJugador = async (req, res) => {
-  try {
-    const jugador = await Jugador.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(jugador);
-  } catch (error) {
-    res.status(500).json({ mensaje: 'Error al actualizar jugador', error });
-  }
-};
-
-// DELETE /jugadores/:id
-const eliminarJugador = async (req, res) => {
-  try {
-    await Jugador.findByIdAndDelete(req.params.id);
-    res.json({ mensaje: 'Jugador eliminado' });
-  } catch (error) {
-    res.status(500).json({ mensaje: 'Error al eliminar jugador', error });
-  }
-};
-
-// Obtener un jugador por su ID
+// Obtener jugador por ID
 const obtenerJugadorPorId = async (req, res) => {
   try {
     const { id } = req.params;
@@ -72,10 +64,56 @@ const obtenerJugadorPorId = async (req, res) => {
   }
 };
 
+// Actualizar jugador
+const actualizarJugador = async (req, res) => {
+  try {
+    const jugador = await Jugador.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+      context: 'query'
+    });
+
+    res.json(jugador);
+  } catch (error) {
+    if (error.code === 11000) {
+      const campoDuplicado = Object.keys(error.keyPattern)[0];
+      if (campoDuplicado === 'dorsal') {
+        return res.status(400).json({ mensaje: 'Dorsal duplicado para este equipo' });
+      }
+      return res.status(400).json({ mensaje: 'Error por campo duplicado', campo: campoDuplicado });
+    }
+    res.status(500).json({ mensaje: 'Error al actualizar jugador', error });
+  }
+};
+
+// Eliminar jugador
+const eliminarJugador = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1. Eliminar el jugador
+    const jugadorEliminado = await Jugador.findByIdAndDelete(id);
+    if (!jugadorEliminado) {
+      return res.status(404).json({ mensaje: 'Jugador no encontrado' });
+    }
+
+    // 2. Eliminar sus registros en la tabla de goleo
+    await TablaGoleo.deleteMany({ jugador: id });
+
+    // 3. Eliminar sus registros en la tabla de tarjetas
+    await TablaTarjetas.deleteMany({ jugador: id });
+
+    res.json({ mensaje: 'Jugador y registros asociados eliminados correctamente' });
+  } catch (error) {
+    console.error('❌ Error al eliminar jugador:', error);
+    res.status(500).json({ mensaje: 'Error al eliminar jugador', error });
+  }
+};
+
 module.exports = {
   crearJugador,
   obtenerJugadoresPorEquipo,
-  actualizarJugador,
-  eliminarJugador,
   obtenerJugadorPorId,
+  actualizarJugador,
+  eliminarJugador
 };

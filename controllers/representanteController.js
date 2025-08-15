@@ -2,7 +2,7 @@ const Representante = require('../models/representante');
 
 const crearRepresentante = async (req, res) => {
   try {
-    console.log('📩 Datos recibidos:', req.body); // 👈
+    console.log('📩 Datos recibidos:', req.body);
     const { nombre, curp, telefono, correo, equipo } = req.body;
 
     const total = await Representante.countDocuments({ equipo });
@@ -15,9 +15,6 @@ const crearRepresentante = async (req, res) => {
 
     res.status(201).json(guardado);
   } catch (error) {
-    if (error.code === 11000) {
-      return res.status(400).json({ mensaje: 'CURP ya registrada' });
-    }
     res.status(500).json({ mensaje: 'Error al registrar representante', error });
   }
 };

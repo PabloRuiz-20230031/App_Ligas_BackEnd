@@ -8,10 +8,14 @@ const representanteSchema = new mongoose.Schema({
   },
   curp: {
     type: String,
-    required: true,
-    unique: true,
     uppercase: true,
-    match: [/^[A-Z][AEIOU][A-Z]{2}\d{6}[HM][A-Z]{2}[A-Z]{3}[0-9A-Z]\d$/, 'CURP no válida']
+    validate: {
+      validator: function (v) {
+        if (!v) return true; // Acepta vacío
+        return /^[A-Z][AEIOU][A-Z]{2}\d{6}[HM][A-Z]{2}[A-Z]{3}[0-9A-Z]\d$/.test(v);
+      },
+      message: 'CURP no válida'
+    }
   },
   telefono: {
     type: String,
@@ -31,5 +35,5 @@ const representanteSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Validar máximo 2 representantes por equipo manualmente
+// ✅ Validar máximo 2 representantes por equipo se mantiene en el controlador
 module.exports = mongoose.model('Representante', representanteSchema);
